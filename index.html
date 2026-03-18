@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تحدي العيد للمبرمجين | Face Palette Challenge</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;700;900&family=Bebas+Neue&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #111118;
+    --gold: #f5c842;
+    --gold-light: #ffd966;
+    --rose: #e85d7a;
+    --teal: #3ecfb2;
+    --white: #f0ece4;
+    --muted: #6b6878;
+    --border: rgba(245,200,66,0.15);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--white);
+    font-family: 'Cairo', sans-serif;
+    overflow-x: hidden;
+    cursor: none;
+  }
+
+  /* CUSTOM CURSOR */
+  .cursor {
+    width: 12px; height: 12px;
+    background: var(--gold);
+    border-radius: 50%;
+    position: fixed; top: 0; left: 0;
+    pointer-events: none;
+    z-index: 9999;
+    transition: transform 0.1s;
+    mix-blend-mode: difference;
+  }
+  .cursor-ring {
+    width: 40px; height: 40px;
+    border: 1.5px solid var(--gold);
+    border-radius: 50%;
+    position: fixed; top: 0; left: 0;
+    pointer-events: none;
+    z-index: 9998;
+    transition: transform 0.25s cubic-bezier(.25,.46,.45,.94), opacity 0.3s;
+    opacity: 0.6;
+  }
+
+  /* NOISE OVERLAY */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 9997;
+    opacity: 0.3;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0;
+    z-index: 100;
+    padding: 1.2rem 3rem;
+    display: flex; justify-content: space-between; align-items: center;
+    border-bottom: 1px solid var(--border);
+    background: rgba(10,10,15,0.8);
+    backdrop-filter: blur(20px);
+  }
+  .nav-logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.4rem;
+    letter-spacing: 0.15em;
+    color: var(--gold);
+  }
+  .nav-tag {
+    font-size: 0.7rem;
+    font-family: 'Space Mono', monospace;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+  }
+  .nav-cta {
+    background: var(--gold);
+    color: #000;
+    font-family: 'Cairo', sans-serif;
+    font-weight: 700;
+    font-size: 0.85rem;
+    padding: 0.5rem 1.4rem;
+    border: none;
+    cursor: none;
+    transition: background 0.2s, transform 0.15s;
+  }
+  .nav-cta:hover { background: var(--gold-light); transform: scale(1.04); }
+
+  /* HERO */
+  .hero {
+    min-height: 100vh;
+    display: flex; flex-direction: column;
+    justify-content: center; align-items: center;
+    text-align: center;
+    padding: 8rem 2rem 4rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Animated grid background */
+  .hero-grid {
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(var(--border) 1px, transparent 1px),
+      linear-gradient(90deg, var(--border) 1px, transparent 1px);
+    background-size: 60px 60px;
+    animation: gridDrift 20s linear infinite;
+    opacity: 0.5;
+  }
+  @keyframes gridDrift {
+    0% { background-position: 0 0; }
+    100% { background-position: 60px 60px; }
+  }
+
+  /* Floating color blobs */
+  .blob {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.15;
+    animation: blobFloat 8s ease-in-out infinite alternate;
+  }
+  .blob-1 { width: 500px; height: 500px; background: var(--gold); top: -100px; right: -100px; animation-delay: 0s; }
+  .blob-2 { width: 400px; height: 400px; background: var(--rose); bottom: -80px; left: -80px; animation-delay: -3s; }
+  .blob-3 { width: 300px; height: 300px; background: var(--teal); top: 40%; left: 20%; animation-delay: -5s; }
+  @keyframes blobFloat {
+    0% { transform: translate(0,0) scale(1); }
+    100% { transform: translate(30px, 20px) scale(1.08); }
+  }
+
+  .hero-eyebrow {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.75rem;
+    letter-spacing: 0.25em;
+    color: var(--teal);
+    text-transform: uppercase;
+    margin-bottom: 1.5rem;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.2s forwards;
+  }
+
+  .hero-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(4rem, 12vw, 11rem);
+    line-height: 0.9;
+    letter-spacing: -0.02em;
+    margin-bottom: 1rem;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.4s forwards;
+  }
+  .hero-title .line-gold { color: var(--gold); display: block; }
+  .hero-title .line-rose { color: var(--rose); display: block; }
+  .hero-title .line-white { color: var(--white); display: block; }
+
+  .hero-sub {
+    font-size: 1.15rem;
+    font-weight: 400;
+    color: rgba(240,236,228,0.65);
+    max-width: 560px;
+    line-height: 1.7;
+    margin: 1.5rem auto 2.5rem;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.6s forwards;
+  }
+
+  .hero-actions {
+    display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.8s forwards;
+  }
+
+  .btn-primary {
+    background: var(--gold);
+    color: #000;
+    font-family: 'Cairo', sans-serif;
+    font-weight: 900;
+    font-size: 1rem;
+    padding: 0.9rem 2.5rem;
+    border: none; cursor: none;
+    clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 14px 100%, 0 calc(100% - 14px));
+    transition: all 0.2s;
+    position: relative; overflow: hidden;
+  }
+  .btn-primary::after {
+    content: '';
+    position: absolute; inset: 0;
+    background: rgba(255,255,255,0.15);
+    transform: translateX(-100%) skewX(-15deg);
+    transition: transform 0.4s;
+  }
+  .btn-primary:hover::after { transform: translateX(200%) skewX(-15deg); }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 12px 40px rgba(245,200,66,0.35); }
+
+  .btn-outline {
+    background: transparent;
+    color: var(--white);
+    font-family: 'Cairo', sans-serif;
+    font-weight: 700;
+    font-size: 1rem;
+    padding: 0.9rem 2.5rem;
+    border: 1px solid rgba(240,236,228,0.25);
+    cursor: none;
+    transition: all 0.2s;
+  }
+  .btn-outline:hover { border-color: var(--gold); color: var(--gold); transform: translateY(-2px); }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(28px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* FLOATING BADGES */
+  .hero-badges {
+    display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap;
+    margin-top: 3rem;
+    opacity: 0; animation: fadeUp 0.8s 1s forwards;
+  }
+  .badge {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    padding: 0.4rem 1rem;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    background: rgba(255,255,255,0.02);
+  }
+  .badge.active { border-color: var(--teal); color: var(--teal); }
+
+  /* MARQUEE */
+  .marquee-wrap {
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    padding: 0.9rem 0;
+    overflow: hidden;
+    background: rgba(245,200,66,0.03);
+  }
+  .marquee-track {
+    display: flex; gap: 3rem;
+    animation: marqueeScroll 18s linear infinite;
+    width: max-content;
+  }
+  .marquee-item {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1rem;
+    letter-spacing: 0.2em;
+    color: var(--muted);
+    white-space: nowrap;
+    display: flex; align-items: center; gap: 1rem;
+  }
+  .marquee-item span { color: var(--gold); font-size: 0.6rem; }
+  @keyframes marqueeScroll {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+
+  /* HOW IT WORKS */
+  section { padding: 6rem 2rem; }
+
+  .section-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.3em;
+    color: var(--teal);
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+  }
+  .section-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(2.5rem, 5vw, 4.5rem);
+    line-height: 1;
+    letter-spacing: 0.02em;
+  }
+  .section-title em { color: var(--gold); font-style: normal; }
+
+  .steps-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5px;
+    margin-top: 4rem;
+    border: 1.5px solid var(--border);
+  }
+  .step {
+    padding: 2.5rem 2rem;
+    background: var(--surface);
+    position: relative;
+    overflow: hidden;
+    transition: background 0.3s;
+  }
+  .step::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    transform: scaleX(0);
+    transition: transform 0.4s;
+  }
+  .step:hover::before { transform: scaleX(1); }
+  .step:hover { background: rgba(245,200,66,0.04); }
+
+  .step-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 5rem;
+    color: rgba(245,200,66,0.08);
+    line-height: 1;
+    margin-bottom: 1rem;
+    transition: color 0.3s;
+  }
+  .step:hover .step-num { color: rgba(245,200,66,0.18); }
+  .step-icon { font-size: 2rem; margin-bottom: 0.75rem; }
+  .step-title { font-size: 1.1rem; font-weight: 700; margin-bottom: 0.5rem; color: var(--white); }
+  .step-desc { font-size: 0.9rem; line-height: 1.7; color: rgba(240,236,228,0.55); }
+
+  /* RULES */
+  .rules-section {
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+  .rules-inner {
+    max-width: 900px; margin: 0 auto;
+  }
+  .rules-list {
+    list-style: none;
+    margin-top: 3rem;
+    display: flex; flex-direction: column; gap: 0;
+  }
+  .rules-list li {
+    display: flex; gap: 1.5rem; align-items: flex-start;
+    padding: 1.5rem 0;
+    border-bottom: 1px solid var(--border);
+    opacity: 0;
+    animation: fadeUp 0.5s forwards;
+  }
+  .rules-list li:nth-child(1) { animation-delay: 0.1s; }
+  .rules-list li:nth-child(2) { animation-delay: 0.2s; }
+  .rules-list li:nth-child(3) { animation-delay: 0.3s; }
+  .rules-list li:nth-child(4) { animation-delay: 0.4s; }
+  .rules-list li:nth-child(5) { animation-delay: 0.5s; }
+  .rules-list li:nth-child(6) { animation-delay: 0.6s; }
+
+  .rule-index {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--gold);
+    min-width: 28px;
+    padding-top: 0.15rem;
+    opacity: 0.7;
+  }
+  .rule-text {
+    font-size: 1rem;
+    line-height: 1.65;
+    color: rgba(240,236,228,0.8);
+  }
+  .rule-text strong { color: var(--white); font-weight: 700; }
+
+  /* PROMPT BOX */
+  .prompt-section { max-width: 860px; margin: 0 auto; }
+  .prompt-box {
+    background: #0d0d14;
+    border: 1px solid var(--border);
+    border-top: 2px solid var(--gold);
+    padding: 2rem;
+    position: relative;
+    margin-top: 3rem;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.8rem;
+    line-height: 1.9;
+    color: rgba(240,236,228,0.65);
+  }
+  .prompt-box .prompt-header {
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    color: var(--gold);
+    margin-bottom: 1.5rem;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .prompt-box .dots {
+    display: flex; gap: 0.4rem;
+  }
+  .prompt-box .dots span {
+    width: 8px; height: 8px; border-radius: 50%;
+  }
+  .dot-r { background: #ff5f56; }
+  .dot-y { background: #ffbd2e; }
+  .dot-g { background: #27c93f; }
+
+  .copy-btn {
+    position: absolute; top: 1rem; left: 1rem;
+    background: rgba(245,200,66,0.1);
+    border: 1px solid rgba(245,200,66,0.25);
+    color: var(--gold);
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.1em;
+    padding: 0.4rem 0.9rem;
+    cursor: none;
+    transition: all 0.2s;
+  }
+  .copy-btn:hover { background: rgba(245,200,66,0.2); }
+  .prompt-highlight { color: var(--teal); }
+  .prompt-bold { color: var(--white); font-weight: 700; }
+
+  /* PALETTE DEMO */
+  .palette-demo {
+    max-width: 1000px; margin: 0 auto;
+    text-align: center;
+  }
+  .palette-grid-demo {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 0;
+    margin-top: 3rem;
+    border: 1px solid var(--border);
+    overflow: hidden;
+  }
+  .palette-swatch {
+    aspect-ratio: 1;
+    position: relative;
+    cursor: none;
+    overflow: hidden;
+    transition: transform 0.3s;
+  }
+  .palette-swatch:hover { transform: scale(1.06); z-index: 2; }
+  .palette-swatch .hex {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    background: rgba(0,0,0,0.5);
+    font-family: 'Space Mono', monospace;
+    font-size: 0.6rem;
+    padding: 0.4rem;
+    text-align: center;
+    color: #fff;
+    backdrop-filter: blur(4px);
+    transform: translateY(100%);
+    transition: transform 0.25s;
+  }
+  .palette-swatch:hover .hex { transform: translateY(0); }
+
+  /* PARTICIPATION */
+  .participate-section {
+    background: linear-gradient(135deg, rgba(245,200,66,0.06) 0%, rgba(232,93,122,0.04) 100%);
+    border-top: 1px solid var(--border);
+    text-align: center;
+  }
+  .participate-inner { max-width: 700px; margin: 0 auto; }
+  .participate-inner p {
+    font-size: 1.05rem;
+    color: rgba(240,236,228,0.65);
+    line-height: 1.8;
+    margin: 1.5rem 0 2.5rem;
+  }
+  .eid-sticker {
+    font-size: 4rem;
+    display: block;
+    margin: 0 auto 1.5rem;
+    animation: stickerPulse 2.5s ease-in-out infinite;
+    filter: drop-shadow(0 0 20px rgba(245,200,66,0.4));
+  }
+  @keyframes stickerPulse {
+    0%, 100% { transform: scale(1) rotate(-3deg); }
+    50% { transform: scale(1.12) rotate(3deg); }
+  }
+
+  .share-tags {
+    display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap;
+    margin-bottom: 2.5rem;
+  }
+  .share-tag {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.8rem;
+    padding: 0.45rem 1rem;
+    border: 1px solid rgba(62,207,178,0.3);
+    color: var(--teal);
+    background: rgba(62,207,178,0.05);
+  }
+
+  /* FOOTER */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 2rem 3rem;
+    display: flex; justify-content: space-between; align-items: center;
+    flex-wrap: wrap; gap: 1rem;
+  }
+  footer p {
+    font-size: 0.75rem;
+    color: var(--muted);
+    font-family: 'Space Mono', monospace;
+  }
+  .footer-logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.2rem;
+    color: var(--gold);
+    letter-spacing: 0.1em;
+  }
+
+  /* SCROLL REVEAL */
+  .reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.7s, transform 0.7s;
+  }
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* RESPONSIVE */
+  @media (max-width: 768px) {
+    nav { padding: 1rem 1.5rem; }
+    .nav-tag { display: none; }
+    section { padding: 4rem 1.25rem; }
+    .palette-grid-demo { grid-template-columns: repeat(3, 1fr); }
+    footer { flex-direction: column; text-align: center; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Cursor -->
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- Nav -->
+<nav>
+  <div class="nav-logo">FacePalette</div>
+  <div class="nav-tag">// EID CHALLENGE 2026</div>
+  <button class="nav-cta" onclick="document.getElementById('participate').scrollIntoView({behavior:'smooth'})">انضم الآن</button>
+</nav>
+
+<!-- Hero -->
+<section class="hero">
+  <div class="hero-grid"></div>
+  <div class="blob blob-1"></div>
+  <div class="blob blob-2"></div>
+  <div class="blob blob-3"></div>
+
+  <div style="position:relative; z-index:2;">
+    <p class="hero-eyebrow">// تحدي العيد للمبرمجين 🎉</p>
+    <h1 class="hero-title">
+      <span class="line-white">وجهك</span>
+      <span class="line-gold">= لوحة</span>
+      <span class="line-rose">ألوانك</span>
+    </h1>
+    <p class="hero-sub">أرسل صورة وجهك للذكاء الاصطناعي، واتركه يحوّل ملامحك إلى موقع ويب فريد. كل وجه، قصة تصميم لم تُروَ بعد.</p>
+    <div class="hero-actions">
+      <button class="btn-primary" onclick="document.getElementById('prompt').scrollIntoView({behavior:'smooth'})">🚀 ابدأ التحدي</button>
+      <button class="btn-outline" onclick="document.getElementById('rules').scrollIntoView({behavior:'smooth'})">اقرأ القواعد</button>
+    </div>
+    <div class="hero-badges">
+      <span class="badge active">✓ مفتوح للجميع</span>
+      <span class="badge">ChatGPT + Dev</span>
+      <span class="badge">Landing Page</span>
+      <span class="badge">عيد 2026</span>
+    </div>
+  </div>
+</section>
+
+<!-- Marquee -->
+<div class="marquee-wrap">
+  <div class="marquee-track" id="marqueeTrack">
+    <span class="marquee-item">FACE COLOR CHALLENGE <span>◆</span></span>
+    <span class="marquee-item">تحدي العيد للمبرمجين <span>◆</span></span>
+    <span class="marquee-item">PALETTE FROM YOUR FACE <span>◆</span></span>
+    <span class="marquee-item">لوحة ألوانك من وجهك <span>◆</span></span>
+    <span class="marquee-item">ONE PAGE · ONE CONCEPT <span>◆</span></span>
+    <span class="marquee-item">EID CHALLENGE 2026 <span>◆</span></span>
+    <!-- Duplicate for seamless loop -->
+    <span class="marquee-item">FACE COLOR CHALLENGE <span>◆</span></span>
+    <span class="marquee-item">تحدي العيد للمبرمجين <span>◆</span></span>
+    <span class="marquee-item">PALETTE FROM YOUR FACE <span>◆</span></span>
+    <span class="marquee-item">لوحة ألوانك من وجهك <span>◆</span></span>
+    <span class="marquee-item">ONE PAGE · ONE CONCEPT <span>◆</span></span>
+    <span class="marquee-item">EID CHALLENGE 2026 <span>◆</span></span>
+  </div>
+</div>
+
+<!-- How it works -->
+<section>
+  <div class="reveal">
+    <p class="section-label">// كيف يعمل</p>
+    <h2 class="section-title">ثلاث خطوات <em>فقط</em></h2>
+  </div>
+  <div class="steps-grid reveal">
+    <div class="step">
+      <div class="step-num">01</div>
+      <div class="step-icon">📸</div>
+      <div class="step-title">أرسل صورة وجهك</div>
+      <div class="step-desc">أرسل صورتك لـ ChatGPT مع البرومبت المخصص. سيقوم بتحليل ألوان بشرتك، شعرك، وعينيك بدقة.</div>
+    </div>
+    <div class="step">
+      <div class="step-num">02</div>
+      <div class="step-icon">🎨</div>
+      <div class="step-title">استلم اللوحة والبلوبرينت</div>
+      <div class="step-desc">ChatGPT يولّد لك لوحة ألوان كاملة مع hex codes، ويحدد نيتش الموقع، والأقسام، والخطوط، والأنيميشن.</div>
+    </div>
+    <div class="step">
+      <div class="step-num">03</div>
+      <div class="step-icon">💻</div>
+      <div class="step-title">طوّر وانشر</div>
+      <div class="step-desc">نفّذ التصميم كـ Landing Page بـ HTML, CSS, JS واحد. لا بورتفوليو — فكرة جديدة كلياً بألوانك أنت.</div>
+    </div>
+  </div>
+</section>
+
+<!-- Rules -->
+<section class="rules-section" id="rules">
+  <div class="rules-inner">
+    <div class="reveal">
+      <p class="section-label">// القواعد والشروط</p>
+      <h2 class="section-title">القواعد <em>ملزمة</em></h2>
+    </div>
+    <ul class="rules-list reveal">
+      <li>
+        <span class="rule-index">01</span>
+        <span class="rule-text"><strong>لا بورتفوليو شخصي.</strong> الموقع لا يمكن أن يكون عرضاً لأعمالك أو سيرتك الذاتية. النيتش يجب أن يكون مختلفاً كلياً.</span>
+      </li>
+      <li>
+        <span class="rule-index">02</span>
+        <span class="rule-text"><strong>ChatGPT يحدد فكرة الموقع.</strong> لا يمكنك تغيير النيتش الذي يقترحه — التزم بما يولّده الذكاء الاصطناعي تماماً.</span>
+      </li>
+      <li>
+        <span class="rule-index">03</span>
+        <span class="rule-text"><strong>ChatGPT يحدد حجم المحتوى.</strong> عدد الكلمات لكل قسم محدد مسبقاً من البرومبت، ويجب الالتزام به دون زيادة أو نقصان.</span>
+      </li>
+      <li>
+        <span class="rule-index">04</span>
+        <span class="rule-text"><strong>صفحة واحدة فقط.</strong> جميع المخرجات يجب أن تكون Landing Page واحدة — لا routing، لا صفحات إضافية.</span>
+      </li>
+      <li>
+        <span class="rule-index">05</span>
+        <span class="rule-text"><strong>البرومبت يولّد كل شيء.</strong> لوحة الألوان، الأقسام، الطباعة، التخطيط، الأنيميشن، والخلفيات — كلها تأتي من الـ prompt مباشرةً.</span>
+      </li>
+      <li>
+        <span class="rule-index">06</span>
+        <span class="rule-text"><strong>شبكة الألوان مطلوبة.</strong> يجب توليد grid يعرض جميع ألوان اللوحة مع كتابة كود Hex واضح على كل مربع.</span>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<!-- Prompt -->
+<section id="prompt">
+  <div class="prompt-section">
+    <div class="reveal">
+      <p class="section-label">// البرومبت الرسمي</p>
+      <h2 class="section-title">انسخ <em>وابدأ</em></h2>
+      <p style="color: rgba(240,236,228,0.55); margin-top: 1rem; font-size: 0.95rem; line-height: 1.7;">هذا هو البرومبت الرسمي للتحدي. أرسله مع صورة وجهك إلى ChatGPT للبدء.</p>
+    </div>
+    <div class="prompt-box reveal">
+      <div class="prompt-header">
+        <div class="dots">
+          <span class="dot-r"></span>
+          <span class="dot-y"></span>
+          <span class="dot-g"></span>
+        </div>
+        <span>face-palette-challenge.prompt</span>
+      </div>
+      <button class="copy-btn" id="copyBtn" onclick="copyPrompt()">نسخ ✓</button>
+      <pre id="promptText" style="white-space: pre-wrap; word-break: break-word;"><span class="prompt-highlight">I will send you an image of my face.</span> Analyze the colors in my face and generate a color palette for a website based on it.
+
+<span class="prompt-bold">**Rules:**</span>
+- The website cannot be a personal portfolio.
+- You determine the website niche/concept.
+- You determine content size and word count per section; it must be followed.
+- The website must be a single-page Landing Page.
+
+After that, create a complete website blueprint, including:
+
+<span class="prompt-bold">Project name / Concept / description</span>
+<span class="prompt-bold">Sections</span> with description, purpose, and word count
+(like Hero, Entry, Fragments, Divider, Featured, Explore, Closing, Footer)
+<span class="prompt-bold">Color palette</span> (hex codes) and usage per element
+(primary background, text, buttons, accents, highlights)
+<span class="prompt-bold">Fonts / typography</span> (headings, body, sizes, line height)
+<span class="prompt-bold">Layout and alignment</span> details
+<span class="prompt-bold">Responsive design</span> guidelines
+<span class="prompt-bold">Animations / interactivity</span> ideas (hover, fade-in, etc.)
+<span class="prompt-bold">Background / imagery</span> suggestions
+<span class="prompt-bold">Accessibility</span> considerations
+
+Also generate a <span class="prompt-highlight">grid image showing all palette colors</span>, with each square labeled with its hex code on top.
+
+Output everything clearly like a blueprint, ready to implement in code.
+Do not use "Digital Diary" — create a <span class="prompt-highlight">new project name</span> and sections based on the niche and palette.</pre>
+    </div>
+  </div>
+</section>
+
+<!-- Palette Demo -->
+<section>
+  <div class="palette-demo">
+    <div class="reveal">
+      <p class="section-label">// مثال على لوحة ألوان</p>
+      <h2 class="section-title">هكذا تبدو <em>النتيجة</em></h2>
+    </div>
+    <div class="palette-grid-demo reveal">
+      <div class="palette-swatch" style="background:#C4856A;"><div class="hex">#C4856A</div></div>
+      <div class="palette-swatch" style="background:#E8C4A0;"><div class="hex">#E8C4A0</div></div>
+      <div class="palette-swatch" style="background:#7B4F3A;"><div class="hex">#7B4F3A</div></div>
+      <div class="palette-swatch" style="background:#2C1810;"><div class="hex">#2C1810</div></div>
+      <div class="palette-swatch" style="background:#D4956B;"><div class="hex">#D4956B</div></div>
+      <div class="palette-swatch" style="background:#F5E6D3;"><div class="hex">#F5E6D3</div></div>
+      <div class="palette-swatch" style="background:#8B6358;"><div class="hex">#8B6358</div></div>
+      <div class="palette-swatch" style="background:#A07850;"><div class="hex">#A07850</div></div>
+      <div class="palette-swatch" style="background:#3D2B20;"><div class="hex">#3D2B20</div></div>
+      <div class="palette-swatch" style="background:#F0D4B8;"><div class="hex">#F0D4B8</div></div>
+      <div class="palette-swatch" style="background:#6B4035;"><div class="hex">#6B4035</div></div>
+      <div class="palette-swatch" style="background:#C8A882;"><div class="hex">#C8A882</div></div>
+    </div>
+    <p style="color: var(--muted); font-size: 0.8rem; margin-top: 1rem; font-family: 'Space Mono', monospace;">مثال: لوحة مستخلصة من ألوان البشرة والشعر</p>
+  </div>
+</section>
+
+<!-- Participate CTA -->
+<section class="participate-section" id="participate">
+  <div class="participate-inner">
+    <div class="reveal">
+      <span class="eid-sticker">🎉</span>
+      <p class="section-label" style="justify-content:center; display:flex;">// عيد مبارك وسعيد</p>
+      <h2 class="section-title">جاهز؟ <em>ابدأ الآن</em></h2>
+      <p>انسخ البرومبت، أرسله مع صورتك لـ ChatGPT، ونفّذ الموقع. شارك نتيجتك مع الهاشتاق وكن جزءاً من تحدي العيد!</p>
+      <div class="share-tags">
+        <span class="share-tag">#FacePaletteChallenge</span>
+        <span class="share-tag">#تحدي_العيد_للمبرمجين</span>
+        <span class="share-tag">#EidChallenge2026</span>
+      </div>
+
+      <!-- WhatsApp CTA -->
+      <div class="whatsapp-box reveal" style="margin: 2rem auto 2.5rem; max-width: 480px; border: 1px solid rgba(37,211,102,0.3); background: rgba(37,211,102,0.05); padding: 1.5rem 2rem; display: flex; flex-direction: column; align-items: center; gap: 1rem;">
+        <div style="display: flex; align-items: center; gap: 0.75rem;">
+          <svg width="28" height="28" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="16" cy="16" r="16" fill="#25D366"/>
+            <path d="M23.5 8.5C21.6 6.6 19.1 5.5 16.4 5.5C10.9 5.5 6.4 10 6.4 15.5C6.4 17.3 6.9 19.1 7.8 20.6L6.3 26L11.8 24.5C13.3 25.3 14.8 25.8 16.4 25.8C21.9 25.8 26.4 21.3 26.4 15.8C26.5 13.1 25.4 10.4 23.5 8.5ZM16.4 24C15 24 13.6 23.6 12.4 22.9L12.1 22.7L8.8 23.6L9.7 20.4L9.5 20.1C8.7 18.8 8.3 17.2 8.3 15.6C8.3 11.1 12 7.4 16.5 7.4C18.6 7.4 20.6 8.2 22.1 9.7C23.6 11.2 24.5 13.2 24.5 15.3C24.5 19.8 20.9 24 16.4 24ZM20.8 17.6C20.6 17.5 19.4 16.9 19.2 16.8C19 16.7 18.9 16.7 18.8 16.9C18.7 17.1 18.2 17.7 18.1 17.8C18 17.9 17.9 17.9 17.7 17.8C17.5 17.7 16.8 17.5 16 16.7C15.4 16.2 15 15.5 14.9 15.3C14.8 15.1 14.9 15 15 14.9C15.1 14.8 15.2 14.7 15.3 14.6C15.4 14.5 15.4 14.4 15.5 14.3C15.6 14.2 15.5 14.1 15.5 14C15.5 13.9 15 12.7 14.8 12.2C14.6 11.8 14.4 11.8 14.3 11.8H13.9C13.8 11.8 13.6 11.8 13.4 12C13.2 12.2 12.6 12.8 12.6 14C12.6 15.2 13.4 16.4 13.5 16.5C13.6 16.6 15 18.8 17.2 19.8C19.4 20.8 19.4 20.5 19.8 20.4C20.2 20.3 21.1 19.7 21.3 19.1C21.5 18.5 21.5 18.1 21.4 18C21.1 17.8 21 17.7 20.8 17.6Z" fill="white"/>
+          </svg>
+          <span style="font-size: 1.05rem; font-weight: 700; color: #25D366;">انضم لمجموعة واتساب</span>
+        </div>
+        <p style="font-size: 0.88rem; color: rgba(240,236,228,0.6); text-align: center; line-height: 1.6; margin: 0;">شارك نتيجتك، اتعلم من الآخرين، وكن جزء من مجتمع المبرمجين المبدعين</p>
+        <a href="https://wa.me/201129142737?text=مرحباً، أريد الانضمام لمجموعة تحدي العيد للمبرمجين 🎉" target="_blank" style="
+          display: inline-flex; align-items: center; gap: 0.6rem;
+          background: #25D366; color: #000;
+          font-family: 'Cairo', sans-serif; font-weight: 900; font-size: 0.95rem;
+          padding: 0.8rem 2rem; text-decoration: none;
+          clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
+          transition: all 0.2s;
+        " onmouseover="this.style.background='#1ebe5d';this.style.transform='translateY(-2px)'" onmouseout="this.style.background='#25D366';this.style.transform='translateY(0)'">
+          <span>📱</span> +201129142737 — تواصل معي
+        </a>
+      </div>
+
+      <button class="btn-primary" onclick="copyPrompt()">📋 انسخ البرومبت وابدأ</button>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer>
+  <div class="footer-logo">FacePalette Challenge</div>
+  <p>// كل وجه قصة تصميم. كل لوحة موقع. كل موقع إبداع.</p>
+  <p style="font-size:0.65rem;">EID 2026 — للمبرمجين بحب 💛</p>
+</footer>
+
+<script>
+  // Custom cursor
+  const cursor = document.getElementById('cursor');
+  const ring = document.getElementById('cursorRing');
+  let mx = 0, my = 0, rx = 0, ry = 0;
+
+  document.addEventListener('mousemove', e => {
+    mx = e.clientX; my = e.clientY;
+    cursor.style.transform = `translate(${mx - 6}px, ${my - 6}px)`;
+  });
+
+  function animateRing() {
+    rx += (mx - rx - 20) * 0.15;
+    ry += (my - ry - 20) * 0.15;
+    ring.style.transform = `translate(${rx}px, ${ry}px)`;
+    requestAnimationFrame(animateRing);
+  }
+  animateRing();
+
+  document.querySelectorAll('button, a, .step, .palette-swatch').forEach(el => {
+    el.addEventListener('mouseenter', () => { cursor.style.transform += ' scale(2)'; ring.style.opacity = '0'; });
+    el.addEventListener('mouseleave', () => { cursor.style.transform = cursor.style.transform.replace(' scale(2)', ''); ring.style.opacity = '0.6'; });
+  });
+
+  // Scroll reveal
+  const reveals = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); } });
+  }, { threshold: 0.12 });
+  reveals.forEach(r => observer.observe(r));
+
+  // Copy prompt
+  function copyPrompt() {
+    const rawText = `I will send you an image of my face. Analyze the colors in my face and generate a color palette for a website based on it.
+
+**Rules:**
+- The website cannot be a personal portfolio.
+- You determine the website niche/concept.
+- You determine content size and word count per section; it must be followed.
+- The website must be a single-page Landing Page.
+
+After that, create a complete website blueprint, including:
+
+Project name / Concept / description
+Sections with description, purpose, and word count (like Hero, Entry, Fragments, Divider, Featured, Explore, Closing, Footer)
+Color palette (hex codes) and usage per element (primary background, text, buttons, accents, highlights)
+Fonts / typography (headings, body, sizes, line height)
+Layout and alignment details
+Responsive design guidelines
+Animations / interactivity ideas (hover, fade-in, etc.)
+Background / imagery suggestions
+Accessibility considerations
+
+Also generate a grid image showing all palette colors, with each square labeled with its hex code on top.
+
+Output everything clearly like a blueprint, ready to implement in code. Do not use "Digital Diary" — create a new project name and sections based on the niche and palette.`;
+
+    navigator.clipboard.writeText(rawText).then(() => {
+      const btn = document.getElementById('copyBtn');
+      if (btn) { btn.textContent = '✓ تم النسخ!'; setTimeout(() => btn.textContent = 'نسخ ✓', 2000); }
+    });
+  }
+</script>
+</body>
+</html>
